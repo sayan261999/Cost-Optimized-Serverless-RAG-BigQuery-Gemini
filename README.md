@@ -1,115 +1,199 @@
-# Cost-Optimized Serverless RAG Pipeline using BigQuery Vector Search and Gemini
+# 🚀 Cost-Optimized Serverless RAG Pipeline using BigQuery Vector Search & Gemini
 
-## Overview
+![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
+![Google Cloud](https://img.shields.io/badge/Google%20Cloud-GCP-4285F4?logo=googlecloud)
+![BigQuery](https://img.shields.io/badge/BigQuery-Vector%20Search-blue)
+![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Gemini-orange)
+![LangChain](https://img.shields.io/badge/LangChain-RAG-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-This project demonstrates how to build a production-style Retrieval-Augmented Generation (RAG) system using Google Cloud Platform. Financial documents (SEC 10-K reports or annual reports) are transformed into vector embeddings, stored in BigQuery, and queried using semantic search. Retrieved document chunks are provided to Gemini to generate grounded answers.
+A production-style **Retrieval-Augmented Generation (RAG)** application built on **Google Cloud Platform** that performs semantic search over financial documents using **BigQuery Vector Search** and generates grounded answers with **Gemini**.
 
 ---
 
-## Features
+# 📖 Overview
+
+Traditional LLMs answer from their training data, which may be outdated or unaware of private enterprise documents.
+
+This project implements a **Retrieval-Augmented Generation (RAG)** pipeline that:
+
+- 📄 Reads financial reports (Annual Reports / SEC 10-K PDFs)
+- ✂️ Splits documents into semantic chunks
+- 🧠 Generates embeddings using Vertex AI
+- 🗄️ Stores vectors in BigQuery
+- 🔍 Retrieves relevant document chunks using Vector Search
+- 🤖 Uses Gemini 2.5 Flash to answer only from retrieved context
+
+The architecture is **serverless**, **cost-efficient**, and built entirely on managed Google Cloud services.
+
+---
+
+# 🏗️ Architecture
+
+```text
+                     PHASE 1 : Knowledge Base
+
+           Financial Reports (PDF)
+                      │
+                      ▼
+           Google Cloud Storage (Optional)
+                      │
+                      ▼
+            LangChain PDF Loader
+                      │
+                      ▼
+        Recursive Text Splitter
+                      │
+                      ▼
+      Vertex AI Text Embeddings
+                      │
+                      ▼
+      BigQuery Vector Search Table
+──────────────────────────────────────────────────────
+
+                  PHASE 2 : Query Pipeline
+
+                 User Question
+                      │
+                      ▼
+          Vertex AI Embedding API
+                      │
+                      ▼
+          BigQuery VECTOR_SEARCH()
+                      │
+               Top-3 Chunks
+                      │
+                      ▼
+          Prompt Construction
+                      │
+                      ▼
+           Gemini 2.5 Flash
+                      │
+                      ▼
+            Grounded Response
+```
+
+---
+
+# ✨ Features
 
 - PDF document ingestion
-- Intelligent text chunking using LangChain
-- Vertex AI text embeddings
+- Intelligent chunking using LangChain
+- Vertex AI Text Embedding
 - BigQuery Vector Search
-- Gemini 2.5 Flash for grounded responses
-- Cost-optimized serverless architecture
-- End-to-end Retrieval-Augmented Generation pipeline
+- Gemini-powered grounded answers
+- Serverless Google Cloud architecture
+- Cost-optimized vector database
+- Retrieval-Augmented Generation (RAG)
 
 ---
 
-## Architecture
+# 🛠️ Tech Stack
 
-```text
-PDF Documents
-      │
-      ▼
-Google Cloud Storage
-      │
-      ▼
-LangChain Loader
-      │
-      ▼
-Text Splitter
-      │
-      ▼
-Vertex AI Embeddings
-      │
-      ▼
-BigQuery Vector Database
-──────────────────────────────
-      │
-User Question
-      │
-      ▼
-Question Embedding
-      │
-      ▼
-BigQuery VECTOR_SEARCH
-      │
-      ▼
-Relevant Context
-      │
-      ▼
-Gemini 2.5 Flash
-      │
-      ▼
-Grounded Answer
-```
-
----
-
-## Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| Programming | Python 3.10 |
+| Category | Technology |
+|----------|------------|
+| Language | Python 3.10 |
 | Framework | LangChain |
-| LLM | Gemini 2.5 Flash |
 | Embeddings | Vertex AI Text Embedding |
+| LLM | Gemini 2.5 Flash |
 | Vector Database | BigQuery Vector Search |
 | Storage | Google Cloud Storage |
-| Cloud Platform | Google Cloud Platform |
+| Cloud | Google Cloud Platform |
+| Data Source | Annual Reports / SEC 10-K PDFs |
 
 ---
 
-## Project Structure
+# 📂 Project Structure
 
 ```text
-src/
-    test_setup.py
-    ingest_data.py
-    embedded_store.py
-    query_rag.py
+Cost-Optimized-Serverless-RAG-BigQuery-Gemini/
 
-requirements.txt
-
-README.md
+│
+├── data/
+│   └── sample.pdf
+│
+├── screenshots/
+│
+├── test_setup.py
+├── ingest_data.py
+├── embed_and_store.py
+├── query_rag.py
+│
+├── requirements.txt
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
 
 ---
 
-## Pipeline
+# ⚙️ Installation
 
-### Phase 1: Knowledge Base
+Clone the repository
 
-- Upload PDFs
-- Load documents
-- Split into chunks
-- Generate embeddings
-- Store vectors in BigQuery
+```bash
+git clone https://github.com/<your-username>/Cost-Optimized-Serverless-RAG-BigQuery-Gemini.git
 
-### Phase 2: Retrieval
+cd Cost-Optimized-Serverless-RAG-BigQuery-Gemini
+```
 
-- Embed user question
-- Search BigQuery using VECTOR_SEARCH
-- Retrieve top-k relevant chunks
-- Send grounded prompt to Gemini
-- Generate answer
+Create environment
+
+```bash
+conda create -n rag_env python=3.10
+
+conda activate rag_env
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Authenticate with Google Cloud
+
+```bash
+gcloud auth application-default login
+
+gcloud auth application-default set-quota-project YOUR_PROJECT_ID
+```
 
 ---
 
-## Example Query
+# 🚀 Running the Project
+
+### 1. Test Environment
+
+```bash
+python test_setup.py
+```
+
+---
+
+### 2. Process PDF
+
+```bash
+python ingest_data.py
+```
+
+---
+
+### 3. Generate Embeddings
+
+```bash
+python embed_and_store.py
+```
+
+---
+
+### 4. Ask Questions
+
+```bash
+python query_rag.py
+```
+
+Example:
 
 ```
 What is the company's strategy regarding enterprise infrastructure and AI?
@@ -117,42 +201,128 @@ What is the company's strategy regarding enterprise infrastructure and AI?
 
 ---
 
-## Example Output
+# 🔍 RAG Workflow
 
-```
-According to the annual report, the company plans to expand enterprise AI capabilities by investing in cloud infrastructure, AI-driven automation, and strategic partnerships...
+```text
+Upload PDF
+
+↓
+
+LangChain Loader
+
+↓
+
+Chunk Documents
+
+↓
+
+Vertex AI Embeddings
+
+↓
+
+BigQuery Vector Search
+
+────────────────────
+
+User Question
+
+↓
+
+Query Embedding
+
+↓
+
+VECTOR_SEARCH()
+
+↓
+
+Relevant Chunks
+
+↓
+
+Gemini
+
+↓
+
+Answer
 ```
 
 ---
 
-## Future Improvements
+# 💰 Cost Optimization
 
-- Streamlit web interface
-- FastAPI REST API
-- Batch document ingestion
-- Hybrid Search (Keyword + Vector)
-- Citation highlighting
-- Multi-document support
-- Docker deployment
-- CI/CD with GitHub Actions
+This project intentionally avoids expensive dedicated vector databases.
+
+Instead it uses:
+
+- ✅ BigQuery Vector Search
+- ✅ Vertex AI Embeddings
+- ✅ Serverless Google Cloud Services
+- ✅ Batch embedding generation
+- ✅ Top-K retrieval to reduce token usage
 
 ---
 
-## Skills Demonstrated
+# 📈 Skills Demonstrated
 
 - Retrieval-Augmented Generation (RAG)
 - Semantic Search
-- Large Language Models (LLMs)
+- Vector Databases
+- Prompt Engineering
 - Google Cloud Platform
 - BigQuery Vector Search
 - Vertex AI
+- Gemini API
 - LangChain
-- Prompt Engineering
 - Data Engineering
 - Python
 
 ---
 
-## License
+# 📸 Demo
 
-MIT License
+Add screenshots here after running the project.
+
+Example:
+
+```
+screenshots/
+
+architecture.png
+
+bigquery_table.png
+
+terminal_output.png
+
+final_answer.png
+```
+
+---
+
+# 🚀 Future Improvements
+
+- Streamlit UI
+- FastAPI REST API
+- Hybrid Search
+- Metadata Filtering
+- Docker Support
+- CI/CD using GitHub Actions
+- Conversation Memory
+- Citation Highlighting
+- Multi-document Support
+
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+**Sayan Das**
+
+GitHub: https://github.com/sayan261999
+
+LinkedIn: *(Add your LinkedIn profile here)*
