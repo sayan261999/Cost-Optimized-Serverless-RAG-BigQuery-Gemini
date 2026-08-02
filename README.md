@@ -30,48 +30,97 @@ The architecture is **serverless**, **cost-efficient**, and built entirely on ma
 
 # 🏗️ Architecture
 
-```text
-                     PHASE 1 : Knowledge Base
+┌────────────────────────────────────────────────────────────────────────────┐
+│                  Cost-Optimized Serverless RAG Pipeline                    │
+│                 BigQuery Vector Search + Gemini 2.5 Flash                  │
+└────────────────────────────────────────────────────────────────────────────┘
 
-           Financial Reports (PDF)
-                      │
-                      ▼
-           Google Cloud Storage (Optional)
-                      │
-                      ▼
-            LangChain PDF Loader
-                      │
-                      ▼
-        Recursive Text Splitter
-                      │
-                      ▼
-      Vertex AI Text Embeddings
-                      │
-                      ▼
-      BigQuery Vector Search Table
-──────────────────────────────────────────────────────
 
-                  PHASE 2 : Query Pipeline
+                    OFFLINE KNOWLEDGE BASE BUILD
+──────────────────────────────────────────────────────────────────────────────────
 
-                 User Question
-                      │
-                      ▼
-          Vertex AI Embedding API
-                      │
-                      ▼
-          BigQuery VECTOR_SEARCH()
-                      │
-               Top-3 Chunks
-                      │
-                      ▼
-          Prompt Construction
-                      │
-                      ▼
-           Gemini 2.5 Flash
-                      │
-                      ▼
-            Grounded Response
-```
+     📄 Annual Report PDF
+             │
+             ▼
+ ┌────────────────────────────┐
+ │ Google Cloud Storage (GCS) │
+ └────────────────────────────┘
+             │
+             ▼
+ ┌────────────────────────────┐
+ │ ingest_data.py             │
+ │ LangChain PDF Loader       │
+ └────────────────────────────┘
+             │
+             ▼
+ ┌────────────────────────────┐
+ │ Recursive Text Splitter    │
+ │ Chunk Size = 1000          │
+ │ Overlap = 200              │
+ └────────────────────────────┘
+             │
+             ▼
+ ┌────────────────────────────┐
+ │ Vertex AI                  │
+ │ Text Embedding API         │
+ └────────────────────────────┘
+             │
+             ▼
+ ┌────────────────────────────┐
+ │ embed_and_store.py         │
+ └────────────────────────────┘
+             │
+             ▼
+ ┌────────────────────────────┐
+ │ BigQuery                   │
+ │ Vector Search Table        │
+ │                            │
+ │ chunk_id                   │
+ │ content                    │
+ │ source_page                │
+ │ text_embedding             │
+ └────────────────────────────┘
+
+
+                    ONLINE QUESTION ANSWERING
+──────────────────────────────────────────────────────────────────────────────────
+
+                     👤 User
+                        │
+                        ▼
+             ┌──────────────────────┐
+             │ query_rag.py         │
+             └──────────────────────┘
+                        │
+                        ▼
+             ┌──────────────────────┐
+             │ Vertex AI            │
+             │ Query Embedding      │
+             └──────────────────────┘
+                        │
+                        ▼
+             ┌──────────────────────┐
+             │ BigQuery             │
+             │ VECTOR_SEARCH()      │
+             │ Top-K = 3            │
+             └──────────────────────┘
+                        │
+                        ▼
+             Relevant Chunks
+                        │
+                        ▼
+             ┌──────────────────────┐
+             │ Prompt Engineering   │
+             └──────────────────────┘
+                        │
+                        ▼
+             ┌──────────────────────┐
+             │ Gemini 2.5 Flash     │
+             │ Grounded Generation  │
+             └──────────────────────┘
+                        │
+                        ▼
+                 ✅ Final Answer
 
 ---
 
